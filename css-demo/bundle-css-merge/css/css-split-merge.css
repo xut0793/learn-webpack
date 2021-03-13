@@ -1,0 +1,18 @@
+.hello {
+  width: 200px;
+  height: 200px;
+  border: 1px solid orange;
+}
+.hello {
+  /* width: 200px;
+  height: 200px;
+  border: 1px solid orange; */
+  background-image: url(../images/avatar.jpg);
+  color: red;
+  font-weight: 600;
+}
+.greet {
+  font-size: 40px;
+  color: orange;
+  font-weight: 600;
+}

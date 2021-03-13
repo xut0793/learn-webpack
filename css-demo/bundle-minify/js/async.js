@@ -1,0 +1,1 @@
+(self.webpackChunk=self.webpackChunk||[]).push([[0],[,,(e,t,s)=>{"use strict";function n(e,t){const s=document.createElement("div");s.textContent=`How are you ? ${e}`,s.classList.add("greet"),t.appendChild(s)}s.r(t),s.d(t,{greet:()=>n}),s(3)},(e,t,s)=>{"use strict";s.r(t)}]]);

@@ -1,0 +1,13 @@
+@import './base.css';
+.hello {
+  /* width: 200px;
+  height: 200px;
+  border: 1px solid orange; */
+  background-image: url('./avatar.jpg');
+  color: red;
+  font-weight: 600;
+}
+.test-index {
+  color: red;
+  font-size: 20px;
+}

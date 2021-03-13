@@ -1,0 +1,10 @@
+<p id="noContextMenu">这个段落右键菜单已被禁用。</p>
+<p>但是这个段落没有被禁用。</p>
+
+<SCript>
+  noContext = document.getElementById('noContextMenu');
+
+noContext.addEventListener('contextmenu', e => {
+  e.preventDefault();
+});
+</SCript>

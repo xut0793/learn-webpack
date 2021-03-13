@@ -8,16 +8,18 @@ WWHD
 
 但随着 `webpack` 逐步发展，功能越来越丰富:
 - 不在受限于只打包 js 代码，依赖社区开发的各种 `loader` ，基本前端依赖的各种资源`（HTML/CSS/Image等）`都能进行处理。
-- 而且 `webpack` 实现的插件机制和社区开发的无数 `plugins`，也模糊了 `webpack` 只能打包`(module bundler)` 和工作流中 tasks 的界限，使得 `webpack` 集成了 `workflow` 工具 `grunt / gulp` 的功能。
+- 而且 `webpack` 实现的插件机制和社区开发的无数 `plugin`，也模糊了 `webpack` 只能打包`(module bundler)` 和工作流中 tasks 的界限，使得 `webpack` 集成了 `workflow` 工具 `grunt / gulp` 的功能。
 - 打包输出的 `bundle.js` 也不在局限浏览器使用，也可打包构建出 node 环境可以使用的制品。
 
 > Packs CommonJs/AMD modules for the browser. Allows to split your codebase into multiple bundles, which can be loaded on demand. Support loaders to preprocess files, i.e. json, jsx, es7, css, less, ... and your custom stuff.
+>
+> 打包CommonJs/AMD模块供浏览器使用，并且允许将你的代码库分割成多个bundle，根据需要加载。提供加载器 loader 预处理文件，如 json, jsx, es7, css, less，…还可以使用 Plugin 定制你需要的功能。
 
 ## Why：webpack 解决了什么问题
 
-伴随着 `node.js` 在前端工程和工具中广泛使用，前端代码开发基本都是用模块化来组织文件，但受限于浏览器不支持 `CommonJS` 模块规范和浏览器网络请求的主要因素，不管是在本地开发服务器，还是生产服务器上，都是需要把模块代码打包成 `bundle` 在浏览器中使用。这种需求就激发了 `browserify / webmake / webpack / rollup / parcel` 等打包工具的产生。
+伴随着 `node.js` 在前端工程和工具中广泛使用，前端代码开发基本都是用模块化来组织文件，但受限于浏览器不支持 `CommonJS` 模块规范和浏览器需要网络请求的主要原因，不管是在本地开发服务器，还是生产服务器上，都是需要把模块代码打包成 `bundle` 在浏览器中使用。这种需求就激发了 `browserify / webmake / webpack / rollup / parcel` 等打包工具的产生。
 
-现在伴随着 `ES module` 规范在各大浏览器都支持的情况下，产生了 `bundless` 思路的打包工具 `snowpack / vite`，在开发服务器上可以充分利用浏览器来管理和组织 `ESM` 规范的模块。但在现实前端项目中会有非常多的模块文件关联，受限于浏览器网络请求的原因，在生产环境中不可能产生瀑布式请求，仍然需要减少资源请求的发送，所以未来在本地开发使用 `bundless`的打包工具，生产环境构建使用 `bundle` 的打包工具相结合会成为主流。
+现在伴随着 `ES module` 规范在各大浏览器都支持的情况下，产生了 `bundless` 思路的打包工具 `snowpack / vite`，在开发服务器上可以充分利用浏览器来管理和组织 `ESM` 规范的模块。但在现实的前端项目中会有非常多的模块文件关联，受限于浏览器网络请求的原因，在生产环境中不可能产生瀑布式请求，仍然需要减少资源请求的发送，所以未来在本地开发使用 `bundless`的打包工具，生产环境构建使用 `bundle` 的打包工具相结合会成为主流。
 
 > 前端模块化发展历史和模块构建工具的发展，请参考 [FE-language/ES/Module]()
 
@@ -98,7 +100,7 @@ npx webpack
 因为 `Webpack` 是基于 `Node.js` 执行的，所以在配置文件中导出也要遵循 `CommonJS`规范，使用`module.exports`导出一个对象。该对象的属性就是`Webpack`打包要使用的参数。
 - `entry`指定`Webpack`构建的入口文件，
 - `output`指定打包后资源输出文件，其中`path`表示输出的路径，`filename`表示输出的文件名
-- `mode`指定Webpack的打包模式，默认是'production'，表示给生产环境打包的。现在我们设置成'none'，这样代码就不会压缩了。
+- `mode`指定Webpack的打包模式，默认是`production`，表示给生产环境打包的。现在我们设置成`none`，这样代码就不会压缩了。
 - `path`是`Node.js`里的路径解析模块，你可以将其看成是一个JS普通对象，该对象有一些方法可以供我们使用。我们现在使用了其`resolve`方法，该方法的作用是将方法参数解析成一个绝对路径返回。`__dirname`是`Node.js`的当前模块范围内的一个全局变量，表示当前文件的路径。这样，`path.resolve(__dirname, './dist')`表示的其实就是当前文件夹根目录的绝对路径`/dist`。
 
 ## 配置文件
@@ -168,11 +170,11 @@ module.exports = function config(env, argv) {
 
 ## webpack：一切皆模块 module
 
-在模块化编程中，开发者将程序分解成离散功能块(discrete chunks of functionality)，称之为模块。
+在模块化编程中，开发者将程序分解成离散功能块(discrete chunks of functionality)，称之为**模块**。
 
 每个模块具有比完整程序更小的接触面，使得校验、调试、测试轻而易举。 精心编写的模块提供了可靠的抽象和封装界限，使得应用程序中每个模块都具有条理清楚的设计和明确的目的。
 
-但应用程序运行又要整合各个模块功能，就像积木通过凹凸点拼装成整体玩具一样，各个模块间也需要使用统一的模块规范来定义模块导入和导出的接口。从模块规范时间顺序，包括`CommonJS / AMD / CMD / UMD / ES Module`。
+但应用程序运行又要整合各个模块功能，就像积木通过凹凸点拼装成整体玩具一样，各个模块间也需要使用统一的模块规范来定义模块导入和导出的接口。从模块规范发展的时间顺序，包括`CommonJS / AMD / CMD / UMD / ES Module`。
 
 在 webpack 世界中，可以视一切皆模块。比如代码中以下使用以下语句导入的文件都会被视为模块进行处理：
 - ES module 规范中的 `import xx from xx` 语句和动态导入语句 `import()`
