@@ -1,4 +1,5 @@
 const path = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 // module.exports = {
 //   mode: 'none',
 //   context: path.resolve(__dirname, '../entry-demo'),
@@ -28,15 +29,16 @@ const path = require('path')
 //   mode: 'none',
 //   context: path.resolve(__dirname, '../entry-demo'),
 //   entry: {
-//     utils: {
-//       import: './utils.js',
-//       dependOn: 'index',
+//     index: {
+//       import: './index.js',
+//       dependOn: 'utils',
 //     },
-//     index: './index.js',
+//     utils: './utils.js',
 //   },
 //   output: {
 //     path: path.resolve(__dirname, 'bundle-depend'),
 //     filename: '[name].bundle.js',
+//     clean: true,
 //   },
 // }
 
@@ -46,14 +48,41 @@ module.exports = {
   entry: {
     index: {
       import: './index.js',
-      filename: '[name][ext]',
+      filename: '[name].js',
     },
-    greet: {
-      import: './greet.js',
-      filename: '[name][ext]',
-    }
   },
   output: {
-    path: path.resolve(__dirname, 'bundle-entry-descriptor'),
+    path: path.resolve(__dirname, 'bundle-entry-filename'),
+    clean: true,
   }
 }
+
+// module.exports = {
+//   mode: 'none',
+//   context: path.resolve(__dirname, '../entry-demo'),
+//   // entry: {
+//   //   module_1: './module-1.js',
+//   //   module_2: './module-2.js',
+//   // },
+//   entry: {
+//     module_1: {
+//       import: './module-1.js',
+//       dependOn: 'shared',
+//     },
+//     module_2: {
+//       import: './module-2.js',
+//       dependOn: 'shared',
+//     },
+//     shared: './module-depend.js',
+//   },
+//   output: {
+//     path: path.resolve(__dirname, 'split-code-entry-depend-runtime-single'),
+//     filename: '[name].bundle.js',
+//   },
+//   plugins: [
+//     new HtmlWebpackPlugin()
+//   ],
+//   optimization: {
+//     runtimeChunk: 'single',
+//   }
+// }

@@ -5,6 +5,9 @@
 //   return Math.round(Math.random() * Math.pow(10, n))
 // }
 
-exports.genRandomNumber = function(n) {
+// exports.genRandomNumber = function(n) {
+//   return Math.round(Math.random() * Math.pow(10, n))
+// }
+module.exports = function genRandomNumber(n) {
   return Math.round(Math.random() * Math.pow(10, n))
 }

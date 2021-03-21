@@ -22,13 +22,14 @@
   1. devServer 配置本地开发服务器
   1. 整体配置文件
 1. webpack 项目构建实践
-  1. webpack 实现目标：代码转化、模块合并、代码校验、代码切分、代码优化
+  实现目标：代码转化、模块合并、代码分割、代码压缩、摇树优化、作用域提升
   1. HTML
   1. CSS
-  1. Asset 静态资源
-  1. js module
-  1. 环境区分
-  1. 性能分析
+  1. Asset
+  1. JS
+  1. Dev:
+  1. Prod:
+  1. 优化：[[译] 保持 webpack 快速运行的诀窍：一本提高构建性能的现场指导手册](https://zhuanlan.zhihu.com/p/33322683)
 1. webpack-chain 使用
 1. webpack 原理浅析
   1. 依赖包管理的原理 `__wepback_require__()`
@@ -37,5 +38,6 @@
   1. tapable 源码
   1. webpack-dev-server 源码
   1. webpack-HMR 源码
+  1. http-proxy
   1. 编写 loader
   1. 编写 plugin

@@ -323,7 +323,6 @@ module.exports = {
 
 以上一个 utils.js 为例，更改配置文件
 ```js
-// TODO： 下面是迭代案例，待后续更新
 module.exports = {
   mode: 'none',
   context: path.resolve(__dirname, '../entry-demo'),
@@ -341,24 +340,21 @@ module.exports = {
 }
 ```
 
-## 描述符对象形式，定义输出文件名
+## 描述符对象形式，在入口定义输出文件名
 ```js
-// TODO: 失败，构建出的 [ext] 无法识别
+// TODO: 失败，在入口使用 [ext] 无法被转换
 module.exports = {
   mode: 'none',
   context: path.resolve(__dirname, '../entry-demo'),
   entry: {
     index: {
       import: './index.js',
-      filename: '[name][ext]',
+      // filename: '[name][ext]', // 失败，在入口使用 [ext] 无法被转换
+      filename: '[name].js',
     },
-    greet: {
-      import: './greet.js',
-      filename: '[name][ext]',
-    }
   },
   output: {
-    path: path.resolve(__dirname, 'bundle-entry-descriptor'),
+    path: path.resolve(__dirname, 'bundle-entry-filename'),
   }
 }
 ```

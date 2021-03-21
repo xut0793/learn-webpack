@@ -1,5 +1,5 @@
 // import { genRandomNumber } from './utils.js'
-const { genRandomNumber } = require('./utils.js')
+const genRandomNumber = require('./utils.js')
 
 function genElement() {
   const eleDiv = document.createElement('div')

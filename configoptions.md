@@ -240,7 +240,7 @@ publicPath: '//cdn-example.com/asserts/', // 此时图片实际请求地址是�
 
 用来配置没有指定入口的 chunk 在输出时的文件名称，这类 chunk 通常都是在运行时生成的，通常是异步加载的模块输出的 chunk。如 `import('path/module')`。
 
-`chunkFilename`值的形式与 `filename`一样，使用占位符变量。默认值是 `[id].js`，以 `0` 开始。如果要使用 `[name]` 占位符变量来表示有意义的名字，通常要配合 webpack 特殊的注释标识`webpackChunkName: name` 来指明当前异步加载的 chunk name，这种 name 方式在开发方便调试，但因为比默认 id 的方式，会增加 chunk 的大小几十 kb，所以生产时常采用默认的 id 占位符。
+`chunkFilename`值的形式与 `filename`一样，使用占位符变量。默认值是 `[id].js`，以 `0` 开始。如果要使用 `[name]` 占位符变量来表示有意义的名字，通常要配合 webpack 特殊的魔法注释(webpack magic comment)标识为`webpackChunkName: name` 来指明当前异步加载的 chunk name，
 
 ```js
 // webapck.config.js
@@ -264,7 +264,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: '[name]@[hash:8].js',
     publicPath: '/asserts/',
-    chunkFilename: '[name].js',
+    chunkFilename: '[chunkhash:8].js',
   }
 }
 ```
@@ -962,7 +962,7 @@ module.export = {
     // splitChunks 默认配置
     splitChunks: {
       // 1. 匹配模式
-      chunks: 'async', // async: 只提取异步 chunk; initial: 只对入口 chunk 生效； all：两种模式同时开启
+      chunks: 'async', // async: 只提取异步 chunk; initial: 包含入口 chunk； all：两种模式同时开启
 
       // 2. 命名：name：true 时可以根据 cacheGroups 和作用范围自动生成提取 chunk 名字，并atuomaticNameDelimiter 配置的符号连接。
       // 比如：vendors~a~b~c.js 意思是 cacheGroups 为 verdors，并且该 chunk 是由 a、b、c 三个文件打包而成。

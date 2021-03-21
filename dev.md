@@ -1,10 +1,4 @@
-# webpack 项目构建配置
+# 开发环境构建
 
-1. 基础demo
-1. HTML
-1. CSS: css / less / scss / stylus / postcss / 提取 / 压缩 / 去除死代码
-1. asset: 图片、字体、json
-1. js: 分割（CDN / 异步） / 压缩 / 去除死代码 / 
-1. 开发环境：自动构建 watch / 开发服务器 自动刷新 / 热模块替换 / 跨域代理 / source-map
-1. 生产环境：hash缓存
-1. 优化：分析 / 打包作用域 / 动态链接库 / 
+1. 基本功能：自动构建 watch / 开发服务器 自动刷新 / 热模块替换 / 跨域代理 / source-map  / DefinePlugin 自定义全局变量 / 环境区分
+1. 优化构建速度和热更新速度: 增量构建（缓存）/ 多进程 
