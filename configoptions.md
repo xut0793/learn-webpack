@@ -493,12 +493,6 @@ module.exports = {
   module: {
     noParse: /jquery/, // 正则
     noParse: (content) => {return /jquery/.test(content)}, // 函数返回 Boolean
-    rules: [
-      {
-        test: /\.js$/,
-        use: ['babel-loader'],
-      },
-    ]
   }
 }
 ```

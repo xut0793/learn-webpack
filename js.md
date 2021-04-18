@@ -315,8 +315,10 @@ output: {
 1. 在入口 `entry` 中配置，分离 bundle
 1. `import()`动态懒加载也会打包成独立的 bundle
 1. `externals`阻止将某些依赖包打包进 bundle 中，而是通过应用运行时从外部获取这些*扩展依赖(external dependencies)*
-1. `optimization.splitChunks` 配置，主动切割 bundle
+1. `optimization.splitChunks` 配置缓存组*cacheGroup*，主动切割 bundle
 1. `DllPlugin` 和 `DllReferencePlugin` 实现了拆分 bundle。`DLL` 一词代表微软最初使用的技术**动态链接库**。
+1. `runtimeChunk` 运行时代码抽离
+1. `IgnorePlugin`忽略第三方依赖包中部分指定目录的代码
 
 ### entry 分离 bundle
 
@@ -949,6 +951,27 @@ module.exports = {
 };
 ```
 案例可见目录 `entry-demo/split-code-entry-depend-runtime-single`
+
+### IgnorePlugin 插件
+
+`IgnorePlugin` 是 webpack 的内置插件，作用是忽略第三方包部分指定目录的代码。
+
+例如: moment (2.24.0版本) 会将所有本地化内容和核心功能一起打包，我们就可以使用 IgnorePlugin 在打包时忽略本地化内容。
+```js
+//webpack.config.js
+module.exports = {
+  plugins: [
+      //忽略 moment 下的 ./locale 目录
+      new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+  ]
+}
+```
+在使用的时候，如果我们需要指定语言，那么需要我们手动的去引入语言包，例如，引入中文语言包:
+```js
+import moment from 'moment';
+import 'moment/locale/zh-cn';// 手动引入
+```
+index.js 中只引入 moment，打包出来的 bundle.js 大小为 263KB，如果配置了 IgnorePlugin，单独引入 `moment/locale/zh-cn`，构建出来的包大小为 55KB。
 
 ## 压缩
 

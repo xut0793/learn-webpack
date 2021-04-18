@@ -1,0 +1,40 @@
+{
+  // 使用 IntelliSense 了解相关属性。 
+  // 悬停以查看现有属性的描述。
+  // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "webpack Chrome",
+      "request": "launch",
+      "type": "pwa-chrome",
+      "url": "http://localhost:8080",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "webpack bin",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/node_modules/webpack/bin/webpack.js",
+      "args": ["--config=./dev-demo/webpack.config.js"],
+      "stopOnEntry": true,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+    },
+    {
+      // 需要提前设置断点，stopOnEntry 对此无效
+      "name": "webpack debugger by npm",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run-script",
+        "debug"
+      ],
+      "skipFiles": [
+        "<node_internals>/**"
+      ]
+    },
+  ]
+}

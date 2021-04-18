@@ -1,0 +1,1 @@
+(()=>{"use strict";document.body.appendChild(function(){const e=document.createElement("div");return e.classList.add("hello"),e.textContent="Hello webpack tree shaking class method",e}())})();
