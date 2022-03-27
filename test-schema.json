@@ -1,0 +1,30 @@
+{
+  "type": "object",
+  "properties": {
+    "host": {
+      "description": "远程服务器IP",
+      "type": ["number", "string"]
+    },
+    "port": {
+      "description": "远程服务器端口号",
+      "type": ["number", "string"]
+    },
+    "username": {
+      "description": "登录远程服务器的账号",
+      "type": ["string"]
+    },
+    "password": {
+      "description": "登录远程服务器的密码",
+      "type": ["string"]
+    },
+    "from": {
+      "description": "需要上传的本地文件目录",
+      "type": ["string"]
+    },
+    "to": {
+      "description": "上传到远程服务器的目录",
+      "type": ["string"]
+    }
+  },
+  "additionalProperties": false
+}

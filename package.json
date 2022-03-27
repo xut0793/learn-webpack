@@ -6,14 +6,16 @@
   "scripts": {
     "build": "webpack --config=./webpack-guide-demo/webpack.config.js",
     "start": "webpack serve --open --config=./webpack-guide-demo/webpack.config.js",
+    "dev": "webpack serve --config=./dev-demo/webpack.config.js",
     "entry-demo": "webpack --config=./entry-demo/webpack.config.js",
     "html-demo": "webpack --config=./html-demo/webpack.config.js",
     "css-demo": "webpack --config=./css-demo/webpack.config.js",
     "asset-demo": "webpack --config=./asset-demo/webpack.config.js",
     "js-demo": "webpack --config=./js-demo/webpack.config.js",
     "dev-demo": "webpack --config=./dev-demo/webpack.config.js",
-    "debug": "webpack --config=./dev-demo/webpack.config.js",
-    "hash-demo": "webpack --config=./hash-demo/webpack.config.js"
+    "debug": "webpack serve --config=./dev-demo/webpack.config.js",
+    "hash-demo": "webpack --config=./hash-demo/webpack.config.js",
+    "bundle-demo": "webpack --config=./bundle-analysis/webpack.config.js"
   },
   "keywords": [],
   "author": "xut",

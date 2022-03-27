@@ -255,9 +255,35 @@ output: {
 }
 ```
 
-### 懒加载 bundle 文件名称
+### 魔法注释 Magic Comments
 
-`webpack` 对通过 `import()` 导入的模块输出单独的文件，默认使用 `[id]` 的变量占位符。我们也可以自定义按需加载产生的 chunk 名称。
+webpack 可以通过在 `import( /** Magic Comments **/ path)` 内联注释的语法，让我们能够对异步加载模块拥有更多控制权。
+
+```js
+// 静态路径导入单个模块文件时，可用的 Magic Comments
+import(
+  /* webpackChunkName: "my-chunk-name" */
+  /* webpackMode: "lazy" */
+  /* webpackExports: ["default", "named"] */
+  /* webpackPrefetch: true */
+  /* webpackPreload: true */
+  './module'
+);
+
+// 动态路径导入多个可能的目标，除了上述可用的 Magic Comments 还可以使用 webpackInclude / webpackExclude 注释条件来筛选符合的模块文件导入
+import(
+  /* webpackInclude: /\.json$/ */
+  /* webpackExclude: /\.noimport\.json$/ */
+  `./locale/${language}`
+);
+
+// webpackIgnore：设置为 true 时，禁用动态导入解析，webpack 将不进行代码分割
+import(/* webpackIgnore: true */ 'ignored-module.js');
+```
+
+#### `webpackChunkName`
+
+`webpack` 通过 `import()` 异步导入的模块，分割输出单独的文件。然后通过魔法注释添加`webpackChunkName`自定义按需加载产生的 chunk 名称。
 
 ```patch
 # 配置文件
@@ -274,12 +300,199 @@ output: {
   eleBtn.textContent = `Click me to generate random number: ${res.genRandomNumber(2)}`
 })
 ```
-此时 `[name]` 的取值需要配合 `webpack` 的魔法注释(`webpack magic comment`)，即如上 `import()` 中写法。
+此时 `[name]` 的取值需要配合 `webpack` 的魔法注释(`webpack magic comment`)，即如上 `import(/* webpackChunkName: 'utils' */'./utils.js')` 中写法，此时，打包输出的结果就是 `utils.bundle.js`。
 
-此时，打包输出的结果就是 `utils.bundle.js`。
+如果是使用动态路径导入多个可能的目标模块，则在魔法注释中的 `webpackChunkName` 也有可以使用的占位符`[index] / [reuqest]`：
+- `[index]`，即当前动态导入声明中表示模块文件的索引；
+- `[request]`表示导入文件的动态部分，即下例中`fileName`部分
 
-`chunkFilename` 命名的变量占位符同 `filename` 一样使用，也可以使用 `hash / chunkhash` 等
+```js
+import(
+  /* webpackChunkName: "utilities-[index]-[request]" */
+  `./utilities/${fileName}`
+)
+```
+以上代码可能生成例如 `utilities-0-divide.js` 这样的文件名。
 
+#### `webpackMode`
+
+webpackMode属性定义了resolve动态模块时的模式。可用的值为：`lazy / lazy-once / eager / weak`：
+
+- lazy: 这是默认模式。它为每个动态导入的模块创建异步chunk。
+- eager: 此模式会阻止Webpack生成额外的chunk。所有导入的模块被包含在当前chunk，所以不需要再发额外的网络请求。它仍然返回一个Promise，但它被自动resolve。使用eager模式的动态导入与常规`import xx from`静态导入的区别在于，静态导入在顶层导入后就解析执行整个模块，但 eager 模式下动态导入整个模块只有当**import()**之后才执行。
+- weak：彻底阻止额外的网络请求。只有当该模块已在其他地方被加载过了之后，Promise才被resolve，否则直接被reject。
+- lazy-once: 动态路径导入时可用，它会为满足导入条件的所有模块创建单一的异步chunk。
+
+```js
+import(
+  `./utilities/${fileName}`
+  /* webpackMode: "lazy-once" */
+)
+  .then(divideModule => {
+    console.log(divideModule.divide(6, 3)); // 2
+  })
+```
+以上代码表示，Webpack会为所有 utilities 目录下的所有模块共同创建一个异步chunk。它会导致用户以一个文件下载所有的模块。
+
+这是默认模式。它为每个动态导入的模块创建异步chunk。
+
+#### `webpackExports`
+
+webpack@5.x 起可用。 `webpackExports` 告知 webpack 只构建指定出口的动态 import() 模块。它可以减小 chunk 的大小。
+
+```js
+// utils.js
+export const foo = 'foo'
+export const bar = 'bar'
+export default {foo: 'foo', bar: 'bar'}
+```
+```js
+import(
+   /* webpackExports: ["default", "foo"] */
+   './utils.js'
+)
+```
+以下代码只会把变量 foo 和 默认导出对象打包到 bundle.js 中，忽略 bar 变量。
+
+#### `webpackInclude / webpackExclude`
+
+这两个只用于动态路径导入时使用，进行一步筛选导入模块。
+- webpackInclude：在动态路径导入解析过程中，用于匹配的正则表达式。只有匹配到的模块才会被打包。
+- webpackExclude：在动态路径导入解析过程中，用于匹配的正则表达式。所有匹配到的模块都不会被打包。
+
+```js
+import(
+  /* webpackInclude: /\.json$/ */ // 会匹配到 ./locale/zh.json 文件
+  /* webpackExclude: /\.noimport\.json$/ */ // 会排除在 ./locale/zh.noimport.json 文件
+  `./locale/${language}`
+);
+```
+webpackInclude 和 webpackExclude 不会影响到前缀，只会影响动态部分，例如上述例子中的 `./locale`。
+
+#### `webpackPrefetch / webpackPreload`
+
+Webpack 4.6.0为我们提供了预先拉取（prefetching）和预先加载（preloading）的功能。使用这些声明可以修改浏览器处理异步chunk的方式来提升加载性能。
+
+- webpackPrefetch：告诉浏览器将来可能需要该资源来进行某些导航跳转。
+- webpackPreload：告诉浏览器在当前导航期间可能需要该资源。
+
+实际上是与 `<link rel="" as="script" href="">` 标签一致的效果。
+
+```js
+// prefetch 使用预先拉取，表示该模块可能以后会用到。然后浏览器会在空闲时间下载该模块，且下载是发生在父级chunk加载完成之后。
+// 原理是内部会创建 <link rel="prefetch" as="script" href="utilities.js"> 添加至页面的头部。因此浏览器会在空闲时间预先拉取该文件。
+import(
+  `./utilities/divide`
+  /* webpackPrefetch: true */
+  /* webpackChunkName: "utilities" */
+)
+
+// preload 预先加载，指明该模块需要立即被使用。异步chunk会和父级chunk并行加载。如果父级chunk先下载好，页面就已可显示了，同时等待异步chunk的下载。这能大幅提升性能。
+// 原理是内部会创建 <link rel="preload" as="script" href="utilities.js">起作用。不当地使用wepbackPreload会损害性能，所以使用的时候要小心。
+import(
+  `./utilities/divide`
+  /* webpackPreload: true */
+  /* webpackChunkName: "utilities" */
+)
+```
+
+
+**认识 `<link ref="preload">` 和 `<link ref="prefetch">`**
+
+正常情况下，我们一般通过linkscr 和 script 标签来引入页面渲染和交互所依赖的js和css 资源；然后这些资源由浏览器决定资源的优先级进行加载、解析、渲染等。
+
+然而，实际场景下，会有如下需求：
+- 有些情况我们需要某些依赖的资源在浏览器进入渲染的主进程之前就被加载，以加快页面渲染速度
+- 或者有些资源是我们后边需要的，我们希望在需要它的时候在进行解析和执行，所以并不想让它的加载影响其他资源的加载及首屏渲染时间。
+- 并且浏览器默认 js的加载、解析和编译是阻塞式的
+
+所以浏览器基于 `link` 和 `script` 标签的不同属性值，向开发者提供了可以更加细粒度地控制浏览器资源加载行为的方法。
+- 基于 link 标签的 `preload`、 `prefetch`、`DNS-prefetch`、`preconnect`、`prerender`
+- 基于 script 标签的 `async`、`defer`
+
+> 上述这些都属于资源预加载(Resource Hints)的方法。
+> 具体参考：
+> [前端性能优化 - Resource Hints 资源预加载](https://juejin.cn/post/6844903545670467592)
+> [使用 Preload/Prefetch 优化你的应用](https://zhuanlan.zhihu.com/p/48521680)
+> [preload与prefetch对比](https://blog.csdn.net/luofeng457/article/details/88409903)
+
+1. preload
+
+在网络请求中，页面通常都会用到某些资源，比如：图片，JS，CSS 等等，在页面完成渲染之前总需要等待这些资源的下载。如果我们能做到预先加载资源，那在资源执行的时候就不必等待网络的开销。
+
+所以 preload 就是一种预加载资源的方式，它向浏览器声明一个需要预加载的资源，浏览器就会提前加载该资源，进行缓存，当资源真正被使用的时候立即执行，就无需等待网络的消耗。
+```html
+<!-- 字体被隐藏在css中间，浏览器有时候不能很好的将他们放入预加载器中，为此我们可以借助 preload -->
+<link rel="preload" href="font.woff" as="font" type="font/woff" crossorigin>
+<!-- preload加载的js脚本其加载和执行的过程是分离的。即preload会预加载相应的脚本代码，待到需要时自行调用； -->
+<link rel="preload" as="script" href="test.js" onload="handleOnload" onerror="handlepreloadError">
+<!--  css加载后立即生效 -->
+<link rel="preload" as="style" href="test.css" onload="handleSheetOnload">
+```
+其中，rel属性值为preload；as属性用于规定资源的类型，并根据资源类型设置Accep请求头，以便能够使用正常的策略去请求对应的资源；href为资源请求地址；onload和onerror则分别是资源加载成功和失败后的回调函数；
+
+其中as的值可以取style、script、image、font、fetch、document、audio、video等；如果as属性被省略，那么该请求将会当做异步请求处理；
+
+另外，在请求跨域资源时推荐加上crossorigin属性，否则可能会导致资源的二次加载（尤其是font资源）；
+
+preload特点
+- preload加载的资源是在浏览器渲染机制之前进行处理的，并且**不会阻塞页面的onload事件**，这是其与众不同的地方；
+- preload可以通过as属性支持加载多种类型的资源，并且可以加载跨域资源；
+- preload加载的js脚本其**加载和执行的过程是分离的**。即 preload会预加载相应的脚本代码，待到需要时自行调用；
+
+
+2. prefetch
+
+prefetch 是一种利用浏览器的空闲时间加载页面将来可能用到的资源的一种机制；通常可以用于加载非首页的其他页面所需要的资源，并且将其放入缓存至少5分钟（无论资源是否可以缓存），以便加快后续页面的首屏速度；
+
+它的特点是当页面跳转时，未完成的prefetch请求不会被中断；
+
+两者区别：
+- preload
+  - 是告诉浏览器预先请求**当前页面**需要的资源，并且浏览器一定会加载这些资源（js 资源除外）。
+  - 需要使用as属性指定特定的资源类型以便浏览器为其分配一定的优先级，并能够正确加载资源；
+  - 一旦页面关闭了，它就会立即停止 preload 获取资源。
+- prefetch 
+  - 是告诉浏览器用户预请求**将来某个页面（非本页面）**可能使用到的资源，浏览器会在空闲的情况下预加载这些资源，但浏览器如果将来不跳转到该页面，那这些资源也就不一定会执行。
+  - 无论资源是否可以缓存，prefecth 预请求的资源都会存储在 `net-stack cache` 中至少5分钟；
+  - 一旦prefetch 发起了请求，即使页面关闭，也不会中断。
+
+> Chrome有四种缓存：http cache、memory cache、Service Worker cache和 http2.0 的 Push cache
+
+3. async / defer
+
+正常情况下，当浏览器在解析HTML源文件时如果遇到script标签，那么解析过程会暂停。如果是内联脚本会立即执行，如果有src属性则发送请求来下载script文件，只有script完全下载并执行后才会继续执行DOM解析。在脚本下载和执行过程中，浏览器是被阻止做其他有用的工作的，包括解析HTML，执行其他脚本，或者渲染CSS布局等。
+
+但是现在，script可以通过添加async或者defer属性来让脚本不必同步执行，阻塞浏览器工作。
+
+```js
+<!-- 没有 defer 或 async，浏览器会立即加载并执行指定的脚本，“立即”指的是在渲染该 script 标签之下的文档元素之前，也就是说不等待后续载入的文档元素，读到就加载并执行。 -->
+<script src="script.js"></script>
+
+<!-- 有 defer，加载后续文档元素的过程将和 script.js 的加载并行进行（异步），但是 script.js 的执行要在所有元素解析完成之后，DOMContentLoaded 事件触发之前完成。 -->
+<script defer src="myscript.js"></script>
+
+<!-- 有 async，加载和渲染后续文档元素的过程将和 script.js 的加载与执行并行进行（异步）。 -->
+<script async src="script.js"></script>
+```
+
+> 可以使用 defer 加载脚本在 head 末尾，这比将脚本放在 body 底部效果来的更好
+
+两者的共同点：
+
+async和defer标注的script在下载时并不会阻塞浏览器其它工作，如HTML解析，并且两者同样支持onload事件回调来解决需要该脚本来执行的初始化。
+
+两者的区分在于脚本执行时机不同：
+
+- defer：表示下载后先不执行，等到浏览器对文档解析完成后，且在触发 DOMContentLoaded 事件前执行该脚本。并且确保多个defer脚本按其在HTML页面中的出现顺序依次执行。显然 defer 是最接近我们对于应用脚本加载和执行的要求的。
+- async：表示下载后立即执行，虽然下载时不阻塞html的解析，但执行时会阻塞浏览器工作，如HTML解析。并且多个async脚本无法保证按其在页面中的出现顺序执行。所以 async 对于应用脚本的用处不大，因为它完全不考虑依赖（哪怕是最低级的顺序执行）
+
+defer 与 preload 的区别
+- defer 只作用于脚本文件，对于样式、图片等资源就无能为力了，并且在 DOMContentLoaded 事件前 defer 加载的资源是要执行的。
+- preload 资源的下载和执行是分开的，待真正使用到才会执行脚本文件。
+
+> webpackChunkName 魔法注释为什么会失效？
+> 检查你的.babelrc和webpack.config.js，有没有移除注释的配置。魔法注释，当然注释得存在才能生效。所以.babelrc里不能有comments: false，webpack的uglifyjs等插件中也不能设置comments: false和extractComments。
 
 ## 代码提取
 

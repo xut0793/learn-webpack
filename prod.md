@@ -8,10 +8,6 @@
 - scope hoisting 作用域提升
 - 文件指纹策略：长效缓存 hash / chunkhash / comtenthash
 
-
-tree-saking 相关概念：  optimization.providedExports
-
-
 ## DCE(Dead Code Elimination) 死代码消除
 
 Dead Code 死代码，即当前应用程序不使用的代码，概括为：**不会执行、不被用到、只写不读**
@@ -730,7 +726,7 @@ webpack 会尝试实现作用域提升，将模块合并到单个作用域中。
 webpack --display-optimization-bailout
 ```
 
-考虑到 Scope Hoisting 依赖源码需采用 ES6 模块化语法，但现代的第三方依赖库会同时构建提供 ES6 模块化的代码，入口文件由 package.json 中的 module 属性提供。。所以为了充分发挥 Scope Hoisting 的作用，可以增加以下模块解析的配置：
+考虑到 Scope Hoisting 依赖源码需采用 ES6 模块化语法，但现代的第三方依赖库会同时构建提供 ES6 模块化的代码，入口文件由 package.json 中的 module 属性提供。所以为了充分发挥 Scope Hoisting 的作用，可以增加以下模块解析的配置：
 ```js
 module.exports = {
   resolve: {

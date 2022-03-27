@@ -177,7 +177,7 @@ module.exports = {
       //  是否将打包结果写入到磁盘之中
       //  默认为false
       //  相当于webpack-dev-server@3.X的 writeToDisk属性
-      writeToDisk: true,
+      writeToDisk: false,
 
       // 设置打包文件存储的目录地址。此属性由webpack-dev-middleware设置
       // 例如当设置为/public,那么访问服务器所有信息都需要加入/public前缀
@@ -218,7 +218,7 @@ module.exports = {
         
       //   是否在浏览器控制台打印打包进度，
       //   相当于webpack-dev-server@3.X的 progress属性
-      progress: true,
+      progress: false,
 
       //  相当于webpack-dev-server@3.X的 sockPath属性
       // path: '',
@@ -252,7 +252,7 @@ module.exports = {
     liveReload: false,
 
     //  是否开启ZeroConf网络
-    bonjour: false,
+    **bonjour**: false,
     
     //  是否将所有404页面都跳转到index.html
     //  boolean | object

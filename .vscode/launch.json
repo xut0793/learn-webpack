@@ -32,6 +32,7 @@
         "run-script",
         "debug"
       ],
+      "stopOnEntry": true,
       "skipFiles": [
         "<node_internals>/**"
       ]
